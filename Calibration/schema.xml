@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Calibration>
+    <Variables>
+        <Variable id='guid'>
+            <ShortName>tps1</ShortName>
+            <Address>1245</Address>
+            <UnitGroup id="'dsdasda"/>
+        </Variable>
+        <Variable id='guid2'>
+            <ShortName>tps1</ShortName>
+            <Address>12455</Address>
+            <UnitGroup id ='dsdad'/>
+        </Variable>
+    </Variables>
+    <UnitGroups>
+        <UnitGroup id="dsdad">
+            
+        </UnitGroup>
+    </UnitGroups>
+</Calibration>
