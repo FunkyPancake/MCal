@@ -70,16 +70,16 @@ namespace CanUpdaterGui {
                 LoggerTextBox.Text += text+"\n";
         }
 
-        private void ConnectCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
-            _calibrationProtocol.Connect();
+        private async void ConnectCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+           await _calibrationProtocol.Connect();
         }
 
         private void DisconnectCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
             _calibrationProtocol.Disconnect();
         }
 
-        private void ProgramCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
-            _calibrationProtocol.Program();
+        private async void ProgramCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+           await _calibrationProtocol.Program();
         }
     }
 }

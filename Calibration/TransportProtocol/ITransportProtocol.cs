@@ -1,12 +1,18 @@
-namespace CalProtocol;
+namespace CalProtocol.TransportProtocol;
 
 public interface ITransportProtocol {
     void SendCommand();
-    void Init(int timeout);
-    TpStatus Query(ReadOnlySpan<byte> command, int responseLength, out byte[] response);
+    void Connect(int channel, int timeout);
+    void Disconnect();
+    Task<(TpStatus Status, byte[] Data)> Query(byte[] command, int responseLength) ;
 }
 
 public enum TpStatus {
     Ok,
-    Timeout
+    NotConnected,
+    Timeout,
+    DeviceError,
+    InvalidLength,
+    InvalidMsgCounter,
+    
 }

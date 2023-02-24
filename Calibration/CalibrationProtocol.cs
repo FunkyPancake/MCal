@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CalProtocol.TransportProtocol;
 using Serilog;
 
 namespace CalProtocol;
@@ -18,26 +18,33 @@ public class CalibrationProtocol {
 
     public bool ConnectionStatus { get; private set; }
 
-    public CmdStatus Connect() {
-        _tp.Init(5000);
-        var status = _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 10, out var response);
-        if (status != TpStatus.Ok) {
+    public async Task<CmdStatus> Connect() {
+        _tp.Connect(7,5000);
+        var status = await _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 1);
+        if (status.Status != TpStatus.Ok) {
             ConnectionStatus = false;
             _logger.Error("");
             return CmdStatus.Ok;
         }
+
         ConnectionStatus = true;
         return CmdStatus.Ok;
     }
 
+    public async Task<CmdStatus> Program() {
+        await _tp.Query(BuildCommand(Command.Program, new byte[] {0, 0}), 3);
+        return (CmdStatus) 0;
+    }
+
     public CmdStatus Disconnect() {
+        _tp.Disconnect();
         ConnectionStatus = false;
         return (CmdStatus) 0;
     }
 
     public CmdStatus Reset() {
-        var status = _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 10, out var response);
-        return (CmdStatus) status;
+        var status = _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 1);
+        return (CmdStatus) status.Result.Item1;
     }
 
     public CmdStatus ReadMemory(uint addr, uint size, out byte[] data) {
@@ -47,10 +54,6 @@ public class CalibrationProtocol {
     }
 
     public CmdStatus WriteMemory(uint addr, byte[] data) {
-        return (CmdStatus) 0;
-    }
-
-    public CmdStatus Program() {
         return (CmdStatus) 0;
     }
 
@@ -85,10 +88,10 @@ public class CalibrationProtocol {
     protected void OnCyclicDataRead() {
     }
 
-    private ReadOnlySpan<byte> BuildCommand(Command command, byte[] payload) {
-        var data = new byte[payload.Length+1];
+    private byte[] BuildCommand(Command command, byte[] payload) {
+        var data = new byte[payload.Length + 1];
         data[0] = (byte) command;
-        payload.CopyTo(data,1);
+        payload.CopyTo(data, 1);
         return data;
     }
 
