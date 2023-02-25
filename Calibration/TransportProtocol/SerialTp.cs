@@ -91,6 +91,8 @@ public class SerialTp : ITransportProtocol, IDisposable {
         return (TpStatus.Ok, response[3..]);
     }
 
+    public event EventHandler? OnNewAsyncMessage;
+
     private async Task<int> ReadBytesAsync(byte[] buffer, int bytesToRead) {
         var bytesRead = 0;
         while (bytesRead < bytesToRead) {

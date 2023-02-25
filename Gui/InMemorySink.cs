@@ -9,7 +9,7 @@ using Serilog.Formatting.Display;
 namespace CanUpdaterGui;
 
 internal class InMemorySink : ILogEventSink {
-    readonly ITextFormatter _textFormatter =
+    private readonly ITextFormatter _textFormatter =
         new MessageTemplateTextFormatter("{Timestamp} [{Level}] {Message}{Exception}");
 
     public ConcurrentQueue<string> Events { get; } = new ConcurrentQueue<string>();
