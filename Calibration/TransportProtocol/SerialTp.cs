@@ -15,14 +15,18 @@ public class SerialTp : ITransportProtocol, IDisposable {
         _logger = logger;
     }
 
-    public void SendCommand() {
-        throw new NotImplementedException();
+    public IEnumerable<int> GetAvailableChannels() {
+        return SerialPort.GetPortNames().Select(portName => int.Parse(portName[3..]));
     }
 
     public void Connect(int channel, int timeout) {
         _timeout = timeout;
 
-        if (_serialPort is null || !_serialPort.IsOpen) {
+        if (_serialPort is not null && _serialPort.IsOpen) {
+            return;
+        }
+
+        try {
             _serialPort = new SerialPort($"COM{channel}") {
                 Encoding = Encoding.UTF8,
                 BaudRate = 460800,
@@ -37,6 +41,9 @@ public class SerialTp : ITransportProtocol, IDisposable {
             _serialPort.DiscardInBuffer();
             _serialPort.DiscardOutBuffer();
         }
+        catch (IOException) {
+            _logger.Error("Invalid channel, {channel} doesn't exist or busy", channel);
+        }
     }
 
     public void Disconnect() {
@@ -45,7 +52,7 @@ public class SerialTp : ITransportProtocol, IDisposable {
 
     public async Task<(TpStatus Status, byte[] Data)> Query(byte[] command, int responseLength) {
         if (_serialPort is null || !_serialPort.IsOpen) {
-            _logger.Error("Attempt to send query without open interface.");
+            _logger.Error("Interface not connected.");
             return (TpStatus.NotConnected, Array.Empty<byte>());
         }
 

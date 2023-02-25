@@ -19,7 +19,7 @@ public class CalibrationProtocol {
     public bool ConnectionStatus { get; private set; }
 
     public async Task<CmdStatus> Connect() {
-        _tp.Connect(7,5000);
+        _tp.Connect(7, 5000);
         var status = await _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 1);
         if (status.Status != TpStatus.Ok) {
             ConnectionStatus = false;
@@ -37,6 +37,7 @@ public class CalibrationProtocol {
     }
 
     public CmdStatus Disconnect() {
+        _tp.Query(BuildCommand(Command.Disconnect),1);
         _tp.Disconnect();
         ConnectionStatus = false;
         return (CmdStatus) 0;
@@ -49,7 +50,6 @@ public class CalibrationProtocol {
 
     public CmdStatus ReadMemory(uint addr, uint size, out byte[] data) {
         data = Array.Empty<byte>();
-        _tp.SendCommand();
         return (CmdStatus) 0;
     }
 
@@ -88,7 +88,11 @@ public class CalibrationProtocol {
     protected void OnCyclicDataRead() {
     }
 
-    private byte[] BuildCommand(Command command, byte[] payload) {
+    private byte[] BuildCommand(Command command, byte[]? payload = null) {
+        if (payload == null) {
+            return new[] {(byte) command};
+        }
+
         var data = new byte[payload.Length + 1];
         data[0] = (byte) command;
         payload.CopyTo(data, 1);

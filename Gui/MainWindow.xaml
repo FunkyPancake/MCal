@@ -51,19 +51,19 @@
         </Grid>
         <GridSplitter Grid.Row="2" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" BorderThickness="5"
                       HorizontalAlignment="Stretch" />
-        <ListView Grid.Row="3" VerticalAlignment="Bottom" ItemsSource="{Binding Frames}">
-            <ListView.View>
-                <GridView AllowsColumnReorder="true"
-                          ColumnHeaderToolTip="Employee Information">
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Timestamp}" Header="Timestamp"></GridViewColumn>
-                    <GridViewColumn
-                        DisplayMemberBinding="{Binding Path=Id, Converter={StaticResource HexValueConverter}}"
-                        Header="Id" />
-                    <GridViewColumn
-                        DisplayMemberBinding="{Binding Path=Payload, Converter={StaticResource HexArrayValueConverter}}"
-                        Header="Payload" />
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <!-- <ListView Grid.Row="3" VerticalAlignment="Bottom" ItemsSource="{Binding Frames}"> -->
+        <!--     <ListView.View> -->
+        <!--         <GridView AllowsColumnReorder="true" -->
+        <!--                   ColumnHeaderToolTip="Employee Information"> -->
+        <!--             <GridViewColumn DisplayMemberBinding="{Binding Path=Timestamp}" Header="Timestamp"></GridViewColumn> -->
+        <!--             <GridViewColumn -->
+        <!--                 DisplayMemberBinding="{Binding Path=Id, Converter={StaticResource HexValueConverter}}" -->
+        <!--                 Header="Id" /> -->
+        <!--             <GridViewColumn -->
+        <!--                 DisplayMemberBinding="{Binding Path=Payload, Converter={StaticResource HexArrayValueConverter}}" -->
+        <!--                 Header="Payload" /> -->
+        <!--         </GridView> -->
+        <!--     </ListView.View> -->
+        <!-- </ListView> -->
     </Grid>
 </Window>
