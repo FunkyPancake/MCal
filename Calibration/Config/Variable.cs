@@ -1,12 +1,12 @@
 namespace CalProtocol.Config;
 
-public class Sensor {
+public class Variable {
     private IUnitGroup _unitGroup;
     private uint valueRaw;
 
     public dynamic Value { get; }
 
-    public Sensor(IUnitGroup unitGroup) {
+    public Variable(Guid id, IUnitGroup unitGroup) {
         _unitGroup = unitGroup;
     }
 

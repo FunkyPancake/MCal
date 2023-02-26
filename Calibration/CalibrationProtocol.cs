@@ -1,4 +1,5 @@
-﻿using CalProtocol.TransportProtocol;
+﻿using System.Text;
+using CalProtocol.TransportProtocol;
 using Serilog;
 
 namespace CalProtocol;
@@ -20,7 +21,7 @@ public class CalibrationProtocol {
 
     public async Task<CmdStatus> Connect() {
         _tp.Connect(7, 5000);
-        var status = await _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 1);
+        var status = await _tp.Query(BuildCommand(Command.Connect), 1);
         if (status.Status != TpStatus.Ok) {
             ConnectionStatus = false;
             _logger.Error("");
@@ -32,56 +33,70 @@ public class CalibrationProtocol {
     }
 
     public async Task<CmdStatus> Program() {
-        await _tp.Query(BuildCommand(Command.Program, new byte[] {0, 0}), 3);
+        await _tp.Query(BuildCommand(Command.Program), 3);
         return (CmdStatus) 0;
     }
 
-    public CmdStatus Disconnect() {
-        _tp.Query(BuildCommand(Command.Disconnect),1);
+    public async Task<CmdStatus> Disconnect() {
+        await _tp.Query(BuildCommand(Command.Disconnect), 1);
         _tp.Disconnect();
         ConnectionStatus = false;
         return (CmdStatus) 0;
     }
 
-    public CmdStatus Reset() {
-        var status = _tp.Query(BuildCommand(Command.Connect, Array.Empty<byte>()), 1);
-        return (CmdStatus) status.Result.Item1;
+    public async Task<CmdStatus> Reset() {
+        var status = await _tp.Query(BuildCommand(Command.Reset), 1);
+        return (CmdStatus) status.Status;
     }
 
-    public CmdStatus ReadMemory(uint addr, uint size, out byte[] data) {
-        data = Array.Empty<byte>();
+    public async Task<(CmdStatus, byte[])> ReadMemory(uint addr, uint size) {
+        var addressBytes = GetAddressBytes(addr);
+        var sizeBytes = GetSizeBytes((ushort) size);
+        var payload = addressBytes.Concat(sizeBytes).ToArray();
+        var status =
+            await _tp.Query(
+                BuildCommand(Command.ReadMemory, payload), (byte)size+1);
+
+        return ((CmdStatus, byte[])) (status.Status, status.Data);
+    }
+
+    public async Task<CmdStatus> WriteMemory(uint addr, byte[] data) {
+        var addressBytes = GetAddressBytes(addr);
+        var sizeBytes = GetSizeBytes((ushort) data.Length);
+        var payload = addressBytes.Concat(sizeBytes).Concat(data).ToArray();
+        var status =
+            await _tp.Query(
+                BuildCommand(Command.ReadMemory, payload),1);
+        
+        return (CmdStatus) status.Status;
+    }
+
+    public async Task<CmdStatus> ConfigureCyclicReadBlock(int readFrequency, int size, Tuple<uint, uint>[] blockDesc) {
         return (CmdStatus) 0;
     }
 
-    public CmdStatus WriteMemory(uint addr, byte[] data) {
+    public async Task<CmdStatus> StartCyclicRead() {
         return (CmdStatus) 0;
     }
 
-    public CmdStatus ConfigureCyclicReadBlock(int readFrequency, int size, Tuple<uint, uint>[] blockDesc) {
+    public async Task<CmdStatus> StopCyclicRead() {
         return (CmdStatus) 0;
     }
 
-    public CmdStatus StartCyclicRead() {
+    public async Task<CmdStatus> ClearReadBlockConfig() {
         return (CmdStatus) 0;
     }
 
-    public CmdStatus StopCyclicRead() {
+    public async Task<CmdStatus> UpdateSoftware() {
+        var status = _tp.Query(BuildCommand(Command.JumpToFbl), 1);
+        return (CmdStatus) status.Status;
+    }
+
+    public async Task<CmdStatus> GetControlBlock() {
         return (CmdStatus) 0;
     }
 
-    public CmdStatus ClearReadBlockConfig() {
-        return (CmdStatus) 0;
-    }
-
-    public CmdStatus UpdateSoftware() {
-        return (CmdStatus) 0;
-    }
-
-    public CmdStatus GetControlBlock() {
-        return (CmdStatus) 0;
-    }
-
-    private CmdStatus ProcessCommand() {
+    private async Task<CmdStatus> ProcessCommand() {
         return (CmdStatus) 0;
     }
 
@@ -95,12 +110,20 @@ public class CalibrationProtocol {
 
         var data = new byte[payload.Length + 1];
         data[0] = (byte) command;
-        payload.CopyTo(data, 1);
+        Buffer.BlockCopy(payload, 0, data, 1, payload.Length);
         return data;
     }
 
     private CmdStatus ProcessCommand(Command cmd) {
         return 0;
+    }
+
+    private byte[] GetAddressBytes(uint value) {
+        return BitConverter.GetBytes(value);
+    }
+
+    private byte[] GetSizeBytes(ushort value) {
+        return BitConverter.GetBytes(value);
     }
 }
 

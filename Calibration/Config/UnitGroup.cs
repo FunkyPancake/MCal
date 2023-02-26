@@ -2,7 +2,7 @@ using System.Xml.Serialization;
 
 namespace CalProtocol.Config;
 
-public class UnitGroup {
+public class UnitGroup : IUnitGroup {
     public Type Type { get; init; }
 
     public UnitGroup() {
@@ -11,7 +11,7 @@ public class UnitGroup {
         Type = typeof(string);
     }
 
-    public UnitGroup(string formatString) {
+    public UnitGroup(Guid id,string formatString) {
         Id = Guid.NewGuid();
         Format = formatString;
     }
