@@ -8,8 +8,8 @@ public struct CanFrame {
 }
 
 public enum Baudrate {
-    Baud125k,
-    Baud250k,
-    Baud500k,
-    Baud1000k
+    Baud125K,
+    Baud250K,
+    Baud500K,
+    Baud1000K
 }

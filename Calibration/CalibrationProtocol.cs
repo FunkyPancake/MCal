@@ -20,14 +20,13 @@ public class CalibrationProtocol {
     public bool ConnectionStatus { get; private set; }
 
     public async Task<CmdStatus> Connect() {
-        _tp.Connect(7, 5000);
+        _tp.Connect();
         var status = await _tp.Query(BuildCommand(Command.Connect), 1);
         if (status.Status != TpStatus.Ok) {
             ConnectionStatus = false;
             _logger.Error("");
             return CmdStatus.Ok;
         }
-
         ConnectionStatus = true;
         return CmdStatus.Ok;
     }
@@ -66,7 +65,7 @@ public class CalibrationProtocol {
         var payload = addressBytes.Concat(sizeBytes).Concat(data).ToArray();
         var status =
             await _tp.Query(
-                BuildCommand(Command.ReadMemory, payload),1);
+                BuildCommand(Command.WriteMemory, payload),1);
         
         return (CmdStatus) status.Status;
     }
@@ -128,12 +127,12 @@ public class CalibrationProtocol {
 }
 
 internal enum Command {
-    Connect,
-    Disconnect,
+    Connect = 0xff,
+    Disconnect = 0xfe,
     Reset,
     GetControlBlock,
-    ReadMemory,
-    WriteMemory,
+    ReadMemory=0xf5,
+    WriteMemory=0xf0,
     Program,
     ConfigureCyclicRead,
     StartCyclicRead,

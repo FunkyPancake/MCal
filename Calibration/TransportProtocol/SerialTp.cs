@@ -6,44 +6,54 @@ namespace CalProtocol.TransportProtocol;
 
 public class SerialTp : ITransportProtocol, IDisposable {
     private readonly ILogger _logger;
-    private SerialPort? _serialPort;
+    private readonly SerialTpConfig _config;
+    private SerialPort _serialPort;
     private byte _rxFrameCounter;
     private byte _txFrameCounter;
     private int _timeout;
 
-    public SerialTp(ILogger logger) {
+    public SerialTp(ILogger logger, SerialTpConfig config) {
         _logger = logger;
+        _config = config;
+        _serialPort = new SerialPort(_config.ComPort) {
+            Encoding = Encoding.UTF8,
+            BaudRate = _config.Baudrate,
+            DataBits = 8,
+            Parity = Parity.None,
+            StopBits = StopBits.One,
+            Handshake = Handshake.None,
+            RtsEnable = false,
+            DtrEnable = false
+        };
     }
 
     public IEnumerable<int> GetAvailableChannels() {
         return SerialPort.GetPortNames().Select(portName => int.Parse(portName[3..]));
     }
 
-    public void Connect(int channel, int timeout) {
-        _timeout = timeout;
-
-        if (_serialPort is not null && _serialPort.IsOpen) {
-            return;
+    public bool Connect() {
+        if (_serialPort.IsOpen) {
+            return true;
         }
 
         try {
-            _serialPort = new SerialPort($"COM{channel}") {
-                Encoding = Encoding.UTF8,
-                BaudRate = 460800,
-                DataBits = 8,
-                Parity = Parity.None,
-                StopBits = StopBits.One,
-                Handshake = Handshake.None,
-                RtsEnable = false,
-                DtrEnable = false
-            };
             _serialPort.Open();
             _serialPort.DiscardInBuffer();
             _serialPort.DiscardOutBuffer();
         }
         catch (IOException) {
-            _logger.Error("Invalid channel, {channel} doesn't exist or busy", channel);
+            _logger.Error("Invalid port, {channel} doesn't exist or busy", _config.ComPort);
+            return false;
         }
+
+        _timeout = _config.CommunicationTimeout;
+        _rxFrameCounter = 0;
+        _txFrameCounter = 0;
+
+        return true;
+    }
+
+    public void Connect(int channel, int timeout) {
     }
 
     public void Disconnect() {
@@ -51,7 +61,7 @@ public class SerialTp : ITransportProtocol, IDisposable {
     }
 
     public async Task<(TpStatus Status, byte[] Data)> Query(byte[] command, int responseLength) {
-        if (_serialPort is null || !_serialPort.IsOpen) {
+        if (!_serialPort.IsOpen) {
             _logger.Error("Interface not connected.");
             return (TpStatus.NotConnected, Array.Empty<byte>());
         }
@@ -80,7 +90,7 @@ public class SerialTp : ITransportProtocol, IDisposable {
         }
 
 
-        _logger.Debug("Response: {data}", LogRaw(response));
+        _logger.Debug("Response: {data}", LogRaw(response[..task.Result]));
         if (response[2] != _rxFrameCounter) {
             _rxFrameCounter++;
             _logger.Error("Communication error - missing rx frames.");

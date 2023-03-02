@@ -190,10 +190,10 @@ public class PeakCan : ICanDevice {
 
     private static Bitrate ConvertBitrate(Baudrate bitrate) {
         var value = bitrate switch {
-            Baudrate.Baud125k => Bitrate.Pcan125,
-            Baudrate.Baud250k => Bitrate.Pcan250,
-            Baudrate.Baud500k => Bitrate.Pcan500,
-            Baudrate.Baud1000k => Bitrate.Pcan1000,
+            Baudrate.Baud125K => Bitrate.Pcan125,
+            Baudrate.Baud250K => Bitrate.Pcan250,
+            Baudrate.Baud500K => Bitrate.Pcan500,
+            Baudrate.Baud1000K => Bitrate.Pcan1000,
             _ => throw new ArgumentOutOfRangeException(nameof(bitrate), bitrate, null)
         };
 

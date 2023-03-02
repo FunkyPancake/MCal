@@ -8,7 +8,7 @@ namespace CalProtocol;
 public class CalibrationConfig {
     private readonly ILogger _logger;
     private Dictionary<Guid,IUnitGroup> _unitGroups = new();
-    public List<Variable> Variables = new();
+    public readonly List<Variable> Variables = new();
     public CalibrationConfig(ILogger logger) {
         _logger = logger;
     }
@@ -26,7 +26,7 @@ public class CalibrationConfig {
             IgnoreComments = true
         };
         var reader = XmlReader.Create(streamReader,settings);
-        var tree = XElement.Load(reader);
+        var tree = await XElement.LoadAsync(reader, LoadOptions.None, CancellationToken.None);
         foreach (var element in tree.Element("UnitGroups")?.Elements()!) {
             var id = Guid.Parse(element!.Attribute("id")!.Value);
             _unitGroups.Add(id,new UnitGroup(id,"texst sample"));
@@ -34,10 +34,14 @@ public class CalibrationConfig {
         foreach (var element in tree?.Element("Variables")?.Elements()!) {
             var id = Guid.Parse(element.Attribute("id")!.Value);
             var tmp = element.Element("UnitGroup")!.Attribute("id")!.Value;
-            var ugid = Guid.Parse(tmp);
-            Variables.Add(new Variable(id,_unitGroups[ugid]));
+            var unitGroupId = Guid.Parse(tmp);
+            Variables.Add(new Variable(id,_unitGroups[unitGroupId]));
         }
-        
+
+        var calItems = tree.Element("Calibration").Elements();
+        foreach (var calItem in calItems) {
+            // calItem.ResolveGuid();
+        }
         
         return true;
     }
