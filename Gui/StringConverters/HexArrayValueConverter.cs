@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Data;
 
-namespace CanUpdaterGui;
+namespace CanUpdaterGui.StringConverters;
 
 [ValueConversion(typeof(byte[]), typeof(string))]
 public class HexArrayValueConverter : IValueConverter

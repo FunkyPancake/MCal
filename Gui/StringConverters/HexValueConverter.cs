@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace CanUpdaterGui;
+namespace CanUpdaterGui.StringConverters;
 
 [ValueConversion(typeof(int), typeof(string))]
 public class HexValueConverter : IValueConverter

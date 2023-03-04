@@ -7,10 +7,11 @@ namespace CalProtocol.TransportProtocol;
 public class SerialTp : ITransportProtocol, IDisposable {
     private readonly ILogger _logger;
     private readonly SerialTpConfig _config;
-    private SerialPort _serialPort;
+    private readonly SerialPort _serialPort;
     private byte _rxFrameCounter;
     private byte _txFrameCounter;
     private int _timeout;
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
     public SerialTp(ILogger logger, SerialTpConfig config) {
         _logger = logger;
@@ -53,11 +54,8 @@ public class SerialTp : ITransportProtocol, IDisposable {
         return true;
     }
 
-    public void Connect(int channel, int timeout) {
-    }
-
     public void Disconnect() {
-        _serialPort?.Close();
+        _serialPort.Close();
     }
 
     public async Task<(TpStatus Status, byte[] Data)> Query(byte[] command, int responseLength) {
@@ -74,6 +72,7 @@ public class SerialTp : ITransportProtocol, IDisposable {
         var bytesToRead = responseLength + 3;
 
         _logger.Debug("Request: {data}", LogRaw(request));
+        await _semaphoreSlim.WaitAsync();
         _serialPort.Write(request, 0, request.Length);
         _txFrameCounter++;
 
@@ -85,6 +84,7 @@ public class SerialTp : ITransportProtocol, IDisposable {
             return (TpStatus.Timeout, Array.Empty<byte>());
         }
 
+        _semaphoreSlim.Release();
         if (task.Result != bytesToRead) {
             _logger.Error("Rx Data to short, expected:{expected}, received:{bytes}", bytesToRead, task.Result);
         }
@@ -106,7 +106,7 @@ public class SerialTp : ITransportProtocol, IDisposable {
     private async Task<int> ReadBytesAsync(byte[] buffer, int bytesToRead) {
         var bytesRead = 0;
         while (bytesRead < bytesToRead) {
-            var read = await _serialPort!.BaseStream.ReadAsync(buffer.AsMemory(bytesRead, bytesToRead - bytesRead));
+            var read = await _serialPort.BaseStream.ReadAsync(buffer.AsMemory(bytesRead, bytesToRead - bytesRead));
             bytesRead += read;
         }
 

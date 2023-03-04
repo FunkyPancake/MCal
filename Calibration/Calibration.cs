@@ -1,8 +1,9 @@
 using System.Text;
+using System.Xml.Linq;
 using CalProtocol.TransportProtocol;
 using Serilog;
 
-namespace CalProtocol.Config;
+namespace CalProtocol;
 
 public class Calibration {
     private readonly ILogger _logger;
@@ -40,8 +41,9 @@ public class Calibration {
     public async void Disconnect() {
     }
 
-    public async void Load(string filePath) {
+    public async Task<XElement> Load(string filePath) {
         await _calibrationConfig.Load(filePath);
+        return _calibrationConfig.GetCalTree();
     }
 
     public async void New() {
