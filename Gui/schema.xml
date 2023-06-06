@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MCalContainer>
+    <ControlBlock>
+        <EcuModel>WgEcu</EcuModel>
+        <SchemaVersion>1.0.0</SchemaVersion>
+    </ControlBlock>
+    <Calibration>
+        <CalGroup Name="Run-Mode Fueling">
+            <CalGroup Name="Corrections">
+                <CalItem id="F9D29410-0985-4954-A710-660D01B22D43" type="Curve">
+                    <LongName>Base Injection Time 1</LongName>
+                    <ReporgramOnly>false</ReporgramOnly>
+                    <BreakpointX id="F9D29410-0985-4954-A710-660D01B22D43"/>
+                    <Output id="30888704-7D94-4D53-AADE-54169CF724E1"/>
+                    <Value>
+                        0,0,0,0,0,0,0,0,0,0,0,0
+                    </Value>
+                </CalItem>
+            </CalGroup>
+        </CalGroup>
+
+        <CalGroup Name="Breakpoints">
+            <CalGroup Name="Primary Breakpoints">
+                <CalItem id="CD41627A-8FE2-4C56-966E-A81FB4663B38" type="Axis">
+                    <LongName>Thorttle Position</LongName>
+                    <ReporgramOnly>true</ReporgramOnly>
+                    <Var id="7c9e6679-7425-40de-944b-e07fc1f90ae7"/>
+                    <Size id="F9D29410-0985-4954-A710-660D01B22D43"/>
+                    <Value>
+                        0,0,0,0,0,0,0,0,0,0,0,0
+                    </Value>
+                </CalItem>
+                <CalItem id="F9D29410-0985-4954-A710-660D01B22D43" type="Scalar">
+                    <LongName>Number of Throttle Position Breakpoints</LongName>
+                    <ReporgramOnly>true</ReporgramOnly>
+                    <Value>12</Value>
+                </CalItem>
+            </CalGroup>
+        </CalGroup>
+    </Calibration>
+
+    <Variables>
+        <Variable id='7c9e6679-7425-40de-944b-e07fc1f90ae7'>
+            <ShortName>tps1</ShortName>
+            <Address>1245</Address>
+            <UnitGroup id="0f8fad5b-d9cb-469f-a165-70867728950e"/>
+        </Variable>
+        <Variable id='8C652DB5-466D-4975-A1E3-9773841CE17A'>
+            <ShortName>tps2</ShortName>
+            <Address>12455</Address>
+            <UnitGroup id="0f8fad5b-d9cb-469f-a165-70867728950e"/>
+        </Variable>
+        <Variable id='30888704-7D94-4D53-AADE-54169CF724E1'>
+            <ShortName>outputVar</ShortName>
+            <Address>12455</Address>
+            <UnitGroup id="0f8fad5b-d9cb-469f-a165-70867728950e"/>
+        </Variable>
+    </Variables>
+    <UnitGroups>
+        <UnitGroup id="0f8fad5b-d9cb-469f-a165-70867728950e">
+            <LongName>Throttle Position</LongName>
+            <FormatString>.2f</FormatString>
+            <Multipliplier>0.01</Multipliplier>
+        </UnitGroup>
+        <UnitGroup id="0360E608-D4F3-4D66-9A7A-4E3764C218ED">
+            <LongName>Default Numeric</LongName>
+            <FormatString>.2f</FormatString>
+            <Multipliplier>0.01</Multipliplier>
+        </UnitGroup>
+    </UnitGroups>
+</MCalContainer>

@@ -1,0 +1,97 @@
+﻿<Window x:Class="CanUpdaterGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CanUpdaterGui"
+        xmlns:stringConverters="clr-namespace:CanUpdaterGui.StringConverters"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    <Window.Resources>
+        <stringConverters:HexArrayValueConverter x:Key="HexArrayValueConverter"></stringConverters:HexArrayValueConverter>
+        <stringConverters:HexValueConverter x:Key="HexValueConverter"></stringConverters:HexValueConverter>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.ConnectCmd}" Executed="ConnectCommandBinding_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.DisconnectCmd}"
+                        Executed="DisconnectCommandBinding_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.ProgramCmd}" Executed="ProgramCommandBinding_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.LoadCmd}" Executed="LoadCommandBinding_Executed" />
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Name="Menu" Height="20"></RowDefinition>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0" Name="MenuBar">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Load" Command="{x:Static local:MainWindow.LoadCmd}" InputGestureText="L" />
+                <MenuItem Header="_Close" />
+                <MenuItem Header="_Save" />
+            </MenuItem>
+            <MenuItem Header="_Options">
+                <MenuItem Header="Connection configuration"></MenuItem>
+                <MenuItem Header="CAN configuration"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Cal">
+            </MenuItem>
+            <MenuItem Header="_Gauge">
+                <MenuItem Header="_Add" Name="GaugeAdd"/>
+            </MenuItem>
+            <MenuItem Header="_Device" InputGestureText="D">
+                <MenuItem Name="Connect" Header="_Connect" Command="{x:Static local:MainWindow.ConnectCmd}"
+                          InputGestureText="C">
+                </MenuItem>
+                <MenuItem Name="Disconnect" Header="_Disconnect"
+                          Command="{x:Static local:MainWindow.DisconnectCmd}" InputGestureText="D">
+                </MenuItem>
+                <MenuItem Name="Program" Header="_Program" Command="{x:Static local:MainWindow.ProgramCmd}"
+                          InputGestureText="P">
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="Calibration" MinWidth="100"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Name="Data" MinWidth="100" Width="500"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Name="CalSpace" MinHeight="100" />
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Name="Gauges" MinHeight="100" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <TreeView Name="CalTree" KeyDown="CalTree_OnKeyDown"></TreeView>
+                </Grid>
+                <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Width="3" Background="Black"
+                              VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+
+                <Grid Grid.Row="2">
+                    <!-- <Button Height="30" Width="100"></Button> -->
+                </Grid>
+            </Grid>
+            <GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="3" Background="Black"
+                          VerticalAlignment="Stretch" HorizontalAlignment="Center" />
+            <Grid Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Name="SystemData" MinHeight="100" Height="20"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Name="Logger" MinHeight="100" />
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0" Name="NumberTextBox" PreviewTextInput="NumberValidationTextBox"
+                         KeyDown="OnKeyDownHandler">
+                </TextBox>
+                <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Width="3" Background="Black"
+                              VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+
+                <TextBox Grid.Row="2" Name="LoggerTextBox" IsReadOnly="True"
+                         VerticalScrollBarVisibility="Auto">
+                </TextBox>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
